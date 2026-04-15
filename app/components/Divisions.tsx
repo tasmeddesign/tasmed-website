@@ -324,21 +324,25 @@ function DivisionCard({
         {division.description}
       </p>
 
-      {/* ── Product List — slides open ── */}
+      {/* ── Product Cards — slides open ── */}
       <div
         className={[
-          "grid grid-cols-1 gap-2 overflow-hidden transition-all duration-300 ease-in-out",
-          expanded ? "max-h-[600px] opacity-100 mt-5 pt-5 border-t border-gray-100" : "max-h-0 opacity-0",
+          "overflow-hidden transition-all duration-300 ease-in-out",
+          expanded
+            ? "max-h-[800px] opacity-100 mt-5 pt-5 border-t border-gray-100"
+            : "max-h-0 opacity-0",
         ].join(" ")}
       >
-        {division.products.map((product) => (
-          <ProductRow key={product.name} product={product} />
-        ))}
+        <div className="grid grid-cols-2 gap-3">
+          {division.products.map((product) => (
+            <ProductCard key={product.name} product={product} />
+          ))}
+        </div>
 
         {/* See all link */}
         <button
           onClick={(e) => e.stopPropagation()}
-          className="inline-flex items-center gap-1.5 font-inter text-[11px] font-semibold tracking-[0.14em] uppercase text-[#F26522] mt-2 hover:gap-3 transition-all duration-200 self-start"
+          className="inline-flex items-center gap-1.5 font-inter text-[11px] font-semibold tracking-[0.14em] uppercase text-[#F26522] mt-4 hover:gap-3 transition-all duration-200"
         >
           View All Products
           <ArrowRight size={11} />
@@ -349,20 +353,36 @@ function DivisionCard({
 }
 
 /* ─────────────────────────────────────────────────────────
-   Product Row — inside an expanded division card
+   Product Card — inside an expanded division card
 ───────────────────────────────────────────────────────── */
-function ProductRow({ product }: { product: Product }) {
+function ProductCard({ product }: { product: Product }) {
   return (
-    <div className="flex items-start gap-3 p-3 rounded-xl bg-[#F9FAFB] hover:bg-[#F26522]/5 transition-colors duration-200 group/row">
-      {/* Dot */}
-      <span className="w-[6px] h-[6px] rounded-full bg-[#F26522]/40 group-hover/row:bg-[#F26522] flex-shrink-0 mt-[5px] transition-colors duration-200" />
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="group/card relative flex flex-col bg-[#F9FAFB] hover:bg-white border border-transparent hover:border-[#F26522]/20 rounded-xl overflow-hidden transition-all duration-250 hover:shadow-[0_4px_16px_rgba(0,0,0,0.07)] cursor-default"
+    >
+      {/* Image placeholder */}
+      <div className="w-full h-[64px] bg-gray-100 group-hover/card:bg-[#F26522]/6 flex items-center justify-center transition-colors duration-250">
+        <span className="font-inter text-[8.5px] tracking-[0.16em] text-gray-300 uppercase">
+          Product Image
+        </span>
+      </div>
 
-      <div className="flex flex-col gap-0.5 min-w-0">
-        <span className="font-barlow font-bold text-[13.5px] text-[#1B2B4B] leading-tight">
+      {/* Content */}
+      <div className="p-3 flex flex-col gap-1 flex-1">
+        <span className="font-barlow font-bold text-[12.5px] text-[#1B2B4B] leading-tight">
           {product.name}
         </span>
-        <span className="font-inter text-[12px] text-gray-400 leading-snug">
+        <span className="font-inter text-[11px] leading-[1.55] text-gray-400">
           {product.description}
+        </span>
+      </div>
+
+      {/* View Details CTA */}
+      <div className="px-3 pb-3">
+        <span className="inline-flex items-center gap-1 font-inter text-[10px] font-semibold tracking-[0.12em] uppercase text-[#F26522] group-hover/card:gap-2 transition-all duration-200">
+          View Details
+          <ArrowRight size={9} />
         </span>
       </div>
     </div>
