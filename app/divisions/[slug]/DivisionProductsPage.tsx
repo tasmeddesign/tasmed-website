@@ -2,9 +2,13 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Search, X } from "lucide-react";
-import type { DivisionData, Product } from "../../../data/divisions";
+import { ArrowLeft, ArrowRight, Search, X, SlidersHorizontal } from "lucide-react";
+import type { DivisionData } from "../../../data/divisions";
+import ProductCard from "../../components/ProductCard";
 
+/* ─────────────────────────────────────────────────────────
+   Division Products Page (client — search + filter)
+───────────────────────────────────────────────────────── */
 export default function DivisionProductsPage({
   division,
 }: {
@@ -20,120 +24,120 @@ export default function DivisionProductsPage({
     return ["All", ...cats];
   }, [division]);
 
-  const filtered = useMemo(() => {
-    return division.products.filter((p) => {
-      const matchesSearch =
-        query.trim() === "" ||
-        p.name.toLowerCase().includes(query.toLowerCase()) ||
-        p.description.toLowerCase().includes(query.toLowerCase());
-      const matchesCategory =
-        activeCategory === "All" || p.category === activeCategory;
-      return matchesSearch && matchesCategory;
-    });
-  }, [division.products, query, activeCategory]);
+  const filtered = useMemo(
+    () =>
+      division.products.filter((p) => {
+        const q = query.trim().toLowerCase();
+        const matchSearch =
+          !q ||
+          p.name.toLowerCase().includes(q) ||
+          p.description.toLowerCase().includes(q) ||
+          p.composition.toLowerCase().includes(q);
+        const matchCat =
+          activeCategory === "All" || p.category === activeCategory;
+        return matchSearch && matchCat;
+      }),
+    [division.products, query, activeCategory]
+  );
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#FAFAFA]">
 
       {/* ── Breadcrumb ── */}
-      <div className="bg-[#F9FAFB] border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-3.5 flex items-center gap-2">
-          <Link
-            href="/"
-            className="font-inter text-[12px] text-gray-400 hover:text-[#1B2B4B] transition-colors"
-          >
-            Home
-          </Link>
-          <span className="text-gray-300 text-[12px]">/</span>
-          <Link
-            href="/#divisions"
-            className="font-inter text-[12px] text-gray-400 hover:text-[#1B2B4B] transition-colors"
-          >
-            Divisions
-          </Link>
-          <span className="text-gray-300 text-[12px]">/</span>
-          <span className="font-inter text-[12px] text-[#1B2B4B] font-medium">
-            {division.name}
-          </span>
+      <div className="bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 h-11 flex items-center gap-2">
+          <Link href="/" className="font-inter text-[11.5px] text-gray-400 hover:text-[#1B2B4B] transition-colors">Home</Link>
+          <Chevron />
+          <Link href="/#divisions" className="font-inter text-[11.5px] text-gray-400 hover:text-[#1B2B4B] transition-colors">Divisions</Link>
+          <Chevron />
+          <span className="font-inter text-[11.5px] text-[#1B2B4B] font-medium">{division.name}</span>
         </div>
       </div>
 
-      {/* ── Division Hero ── */}
-      <div className="bg-[#1B2B4B] py-16 md:py-20 px-6">
-        <div className="max-w-7xl mx-auto lg:px-2">
+      {/* ── Hero ── */}
+      <div className="relative bg-[#1B2B4B] overflow-hidden">
+        {/* Background texture circles */}
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-white/[0.02] -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-[#F26522]/5 translate-y-1/2 -translate-x-1/4 pointer-events-none" />
+
+        <div className="relative max-w-7xl mx-auto px-6 lg:px-8 pt-10 pb-14">
+          {/* Back link */}
           <Link
             href="/"
-            className="inline-flex items-center gap-2 font-inter text-[12px] text-white/40 hover:text-white/70 transition-colors mb-8"
+            className="inline-flex items-center gap-2 font-inter text-[12px] font-medium text-white/35 hover:text-white/70 transition-colors mb-10 group"
           >
-            <ArrowLeft size={13} />
+            <ArrowLeft size={13} className="group-hover:-translate-x-0.5 transition-transform duration-200" />
             Back to Home
           </Link>
 
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-            <div>
-              <span className="inline-flex items-center gap-2 font-inter text-[10.5px] font-semibold tracking-[0.22em] text-[#F26522] uppercase mb-4">
-                <span className="w-5 h-px bg-[#F26522]" />
-                Tasmed Division
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-10">
+            {/* Left — text */}
+            <div className="max-w-[620px]">
+              <span className="inline-flex items-center gap-2 font-inter text-[10px] font-semibold tracking-[0.25em] text-[#F26522] uppercase mb-5">
+                <span className="w-6 h-px bg-[#F26522]" />
+                Tasmed — {division.name} Division
               </span>
-              <h1 className="font-barlow font-black text-white text-[40px] md:text-[56px] leading-[1.02] tracking-tight mb-4">
+
+              <h1 className="font-barlow font-black text-white leading-[0.98] tracking-tight mb-5"
+                style={{ fontSize: "clamp(40px, 5vw, 68px)" }}>
                 {division.name}
               </h1>
-              <p className="font-inter text-[15px] leading-[1.8] text-white/55 max-w-[560px]">
+
+              <p className="font-inter text-[15px] leading-[1.85] text-white/50 max-w-[500px]">
                 {division.fullDescription}
               </p>
             </div>
 
-            <div className="flex-shrink-0">
-              <div className="inline-flex flex-col items-center justify-center w-[100px] h-[100px] rounded-2xl border border-white/10 bg-white/5">
-                <span className="font-barlow font-black text-[36px] text-white leading-none">
-                  {division.products.length}
-                </span>
-                <span className="font-inter text-[10px] tracking-[0.15em] text-white/40 uppercase mt-1">
-                  Products
-                </span>
-              </div>
+            {/* Right — stats */}
+            <div className="flex gap-4 flex-shrink-0">
+              <StatBox value={division.products.length.toString()} label="Products" />
+              <StatBox value={`${categories.length - 1}`} label="Categories" />
             </div>
           </div>
         </div>
       </div>
 
-      {/* ── Search + Filter Bar ── */}
-      <div className="sticky top-[72px] z-30 bg-white border-b border-gray-100 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-          {/* Search */}
-          <div className="relative flex-1 max-w-[360px]">
-            <Search
-              size={14}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
-            />
+      {/* ── Sticky Search + Filter Bar ── */}
+      <div className="sticky top-[72px] z-30 bg-white border-b border-gray-100 shadow-[0_1px_12px_rgba(0,0,0,0.06)]">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+
+          {/* Search input */}
+          <div className="relative w-full sm:w-[300px] flex-shrink-0">
+            <Search size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
             <input
               type="text"
-              placeholder="Search products..."
+              placeholder={`Search ${division.name} products…`}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full pl-9 pr-9 py-2.5 font-inter text-[13px] text-[#1B2B4B] border border-gray-200 rounded-lg outline-none focus:border-[#F26522] focus:ring-1 focus:ring-[#F26522]/20 transition-all placeholder:text-gray-400"
+              className="w-full pl-9 pr-8 py-2 font-inter text-[13px] text-[#1B2B4B] placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:border-[#F26522] focus:ring-2 focus:ring-[#F26522]/15 transition-all bg-[#FAFAFA]"
             />
             {query && (
               <button
                 onClick={() => setQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
               >
-                <X size={13} />
+                <X size={12} />
               </button>
             )}
           </div>
 
-          {/* Category filters */}
-          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
+          {/* Divider */}
+          <span className="hidden sm:block w-px h-6 bg-gray-200 flex-shrink-0" />
+
+          {/* Filter icon */}
+          <SlidersHorizontal size={14} className="hidden sm:block text-gray-400 flex-shrink-0" />
+
+          {/* Category chips */}
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide w-full sm:w-auto">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
                 className={[
-                  "whitespace-nowrap font-inter text-[11.5px] font-medium px-3.5 py-2 rounded-full border transition-all duration-200",
+                  "whitespace-nowrap font-inter text-[11px] font-semibold px-3.5 py-1.5 rounded-full border transition-all duration-200 flex-shrink-0",
                   activeCategory === cat
-                    ? "bg-[#1B2B4B] text-white border-[#1B2B4B]"
-                    : "bg-white text-gray-500 border-gray-200 hover:border-[#1B2B4B]/30 hover:text-[#1B2B4B]",
+                    ? "bg-[#1B2B4B] text-white border-[#1B2B4B] shadow-sm"
+                    : "bg-white text-gray-500 border-gray-200 hover:border-[#1B2B4B]/40 hover:text-[#1B2B4B]",
                 ].join(" ")}
               >
                 {cat}
@@ -144,63 +148,81 @@ export default function DivisionProductsPage({
       </div>
 
       {/* ── Product Grid ── */}
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-14">
-        <p className="font-inter text-[13px] text-gray-400 mb-8">
-          Showing{" "}
-          <span className="text-[#1B2B4B] font-semibold">{filtered.length}</span>{" "}
-          {filtered.length === 1 ? "product" : "products"}
-          {activeCategory !== "All" && (
-            <>
-              {" "}in{" "}
-              <span className="text-[#F26522]">{activeCategory}</span>
-            </>
-          )}
-          {query && (
-            <>
-              {" "}for &ldquo;
-              <span className="text-[#F26522]">{query}</span>&rdquo;
-            </>
-          )}
-        </p>
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
 
+        {/* Result summary */}
+        <div className="flex items-center justify-between mb-8">
+          <p className="font-inter text-[13px] text-gray-400">
+            {filtered.length === 0
+              ? "No products match your filters"
+              : <>
+                  <span className="font-semibold text-[#1B2B4B]">{filtered.length}</span>
+                  {" "}{filtered.length === 1 ? "product" : "products"}
+                  {activeCategory !== "All" && <> · <span className="text-[#F26522]">{activeCategory}</span></>}
+                  {query && <> · &ldquo;<span className="text-[#F26522]">{query}</span>&rdquo;</>}
+                </>
+            }
+          </p>
+
+          {(query || activeCategory !== "All") && (
+            <button
+              onClick={() => { setQuery(""); setActiveCategory("All"); }}
+              className="font-inter text-[11.5px] font-semibold text-[#F26522] hover:underline underline-offset-2 flex items-center gap-1"
+            >
+              <X size={11} />
+              Clear
+            </button>
+          )}
+        </div>
+
+        {/* Empty state */}
         {filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
-              <Search size={24} className="text-gray-300" />
+          <div className="flex flex-col items-center justify-center py-28 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-5">
+              <Search size={22} className="text-gray-300" />
             </div>
-            <p className="font-barlow font-bold text-[18px] text-[#1B2B4B] mb-2">
-              No products found
-            </p>
-            <p className="font-inter text-[14px] text-gray-400">
-              Try a different search term or category.
+            <p className="font-barlow font-bold text-[20px] text-[#1B2B4B] mb-2">No products found</p>
+            <p className="font-inter text-[14px] text-gray-400 max-w-[300px]">
+              Try a different keyword or remove the active category filter.
             </p>
             <button
               onClick={() => { setQuery(""); setActiveCategory("All"); }}
-              className="mt-5 font-inter text-[12px] font-semibold text-[#F26522] hover:underline"
+              className="mt-6 font-inter text-[12px] font-semibold tracking-[0.14em] uppercase text-white bg-[#F26522] px-6 py-2.5 rounded-lg hover:bg-[#1B2B4B] transition-colors duration-250"
             >
-              Clear filters
+              Reset Filters
             </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {filtered.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard
+                key={product.id}
+                name={product.name}
+                description={product.description}
+                composition={product.composition}
+                category={product.category}
+              />
             ))}
           </div>
         )}
       </div>
 
       {/* ── Footer strip ── */}
-      <div className="border-t border-gray-100 bg-[#F9FAFB] py-10 px-6 mt-6">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="font-inter text-[13px] text-gray-400">
-            Looking for a different therapeutic area?
-          </p>
+      <div className="bg-white border-t border-gray-100 py-10 px-6 mt-4">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-5">
+          <div>
+            <p className="font-barlow font-bold text-[16px] text-[#1B2B4B]">
+              Explore other therapeutic divisions
+            </p>
+            <p className="font-inter text-[13px] text-gray-400 mt-0.5">
+              Tasmed covers 11 specialised pharmaceutical verticals.
+            </p>
+          </div>
           <Link
-            href="/"
-            className="inline-flex items-center gap-2 font-inter text-[12px] font-semibold tracking-[0.14em] uppercase text-white bg-[#1B2B4B] px-6 py-3 rounded-lg hover:bg-[#F26522] transition-colors duration-250"
+            href="/#divisions"
+            className="inline-flex items-center gap-2 font-inter text-[11.5px] font-semibold tracking-[0.15em] uppercase text-white bg-[#1B2B4B] px-7 py-3 rounded-xl hover:bg-[#F26522] transition-colors duration-250 flex-shrink-0"
           >
-            View All Divisions
+            All Divisions
             <ArrowRight size={13} />
           </Link>
         </div>
@@ -209,67 +231,16 @@ export default function DivisionProductsPage({
   );
 }
 
-/* ─────────────────────────────────────────────────────────
-   Product Card
-───────────────────────────────────────────────────────── */
-function ProductCard({ product }: { product: Product }) {
+/* ── Small helpers ── */
+function StatBox({ value, label }: { value: string; label: string }) {
   return (
-    <div className="group relative bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_12px_36px_rgba(0,0,0,0.10)] hover:-translate-y-1 transition-all duration-300 flex flex-col">
-      <span className="absolute top-0 left-0 w-full h-[3px] bg-[#F26522] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
-
-      {/* Image placeholder */}
-      <div className="w-full h-[110px] bg-gradient-to-br from-[#F9FAFB] to-[#F1F5F9] flex flex-col items-center justify-center gap-2 border-b border-gray-100">
-        <div className="w-10 h-10 rounded-full bg-[#F26522]/10 flex items-center justify-center">
-          <PillIcon />
-        </div>
-        <span className="font-inter text-[9px] tracking-[0.16em] text-gray-300 uppercase">
-          Product Image
-        </span>
-      </div>
-
-      {/* Body */}
-      <div className="p-5 flex flex-col gap-3 flex-1">
-        {product.category && (
-          <span className="self-start font-inter text-[9.5px] font-semibold tracking-[0.16em] uppercase text-[#F26522] bg-[#F26522]/8 px-2.5 py-1 rounded-full">
-            {product.category}
-          </span>
-        )}
-        <h3 className="font-barlow font-bold text-[15.5px] text-[#1B2B4B] leading-tight tracking-tight">
-          {product.name}
-        </h3>
-        <p className="font-inter text-[12.5px] leading-[1.65] text-gray-400 flex-1">
-          {product.description}
-        </p>
-        <p className="font-inter text-[11px] text-gray-300 leading-snug border-t border-gray-100 pt-3">
-          {product.composition}
-        </p>
-      </div>
-
-      {/* CTA */}
-      <div className="px-5 pb-5">
-        <button className="w-full inline-flex items-center justify-center gap-2 font-inter text-[11.5px] font-semibold tracking-[0.14em] uppercase text-[#1B2B4B] border border-[#1B2B4B]/15 py-2.5 rounded-xl hover:bg-[#1B2B4B] hover:text-white transition-all duration-250 group-hover:bg-[#F26522] group-hover:border-[#F26522] group-hover:text-white">
-          View Details
-          <ArrowRight size={12} />
-        </button>
-      </div>
+    <div className="flex flex-col items-center justify-center w-[88px] h-[88px] rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm">
+      <span className="font-barlow font-black text-[32px] text-white leading-none">{value}</span>
+      <span className="font-inter text-[9.5px] tracking-[0.14em] text-white/40 uppercase mt-1">{label}</span>
     </div>
   );
 }
 
-function PillIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="#F26522"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" />
-      <path d="m8.5 8.5 7 7" />
-    </svg>
-  );
+function Chevron() {
+  return <span className="text-gray-300 text-[11px] select-none">/</span>;
 }
