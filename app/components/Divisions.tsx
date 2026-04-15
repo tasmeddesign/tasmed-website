@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   Stethoscope,
   Baby,
@@ -8,170 +9,102 @@ import {
   Eye,
   Brain,
   HeartPulse,
+  Pill,
+  Bone,
+  FlaskConical,
+  Venus,
   ArrowRight,
-  ChevronDown,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 /* ─────────────────────────────────────────────────────────
-   Data
+   Division cards data (UI layer — links to data/divisions.ts slugs)
 ───────────────────────────────────────────────────────── */
-interface Product {
-  name: string;
-  description: string;
-}
-
-interface Division {
+interface DivisionCard {
+  slug: string;
   icon: LucideIcon;
   name: string;
   description: string;
-  products: Product[];
+  productCount: number;
 }
 
-const DIVISIONS: Division[] = [
+const DIVISIONS: DivisionCard[] = [
   {
+    slug: "neurology",
     icon: Brain,
     name: "Neurology",
-    description:
-      "Targeted neuro formulations supporting cognitive function and nervous system health.",
-    products: [
-      {
-        name: "Clonazepam 0.5 mg",
-        description: "Antiepileptic and anxiolytic for seizure management",
-      },
-      {
-        name: "Escitalopram 10 mg",
-        description: "SSRI for depression and generalised anxiety disorder",
-      },
-      {
-        name: "Pregabalin 75 mg",
-        description: "Neuropathic pain and partial-seizure adjunct therapy",
-      },
-      {
-        name: "Sertraline 50 mg",
-        description: "First-line treatment for OCD and panic disorders",
-      },
-    ],
+    description: "Targeted neuro formulations supporting cognitive function and nervous system health.",
+    productCount: 8,
   },
   {
+    slug: "cardiology",
     icon: HeartPulse,
     name: "Cardiology",
-    description:
-      "Cardio-protective products developed to maintain a healthy heart and circulation.",
-    products: [
-      {
-        name: "Amlodipine 5 mg",
-        description: "Calcium channel blocker for hypertension and angina",
-      },
-      {
-        name: "Atorvastatin 20 mg",
-        description: "HMG-CoA reductase inhibitor for LDL reduction",
-      },
-      {
-        name: "Metoprolol 25 mg",
-        description: "Selective beta-blocker for heart rate control",
-      },
-      {
-        name: "Clopidogrel 75 mg",
-        description: "Antiplatelet agent for coronary artery disease",
-      },
-    ],
+    description: "Cardio-protective products developed to maintain a healthy heart and circulation.",
+    productCount: 8,
   },
   {
+    slug: "dermatology",
     icon: Stethoscope,
     name: "Dermatology",
-    description:
-      "Advanced skincare formulations addressing a broad spectrum of dermal conditions.",
-    products: [
-      {
-        name: "Mometasone 0.1% Cream",
-        description: "Topical corticosteroid for eczema and psoriasis",
-      },
-      {
-        name: "Clindamycin 1% Gel",
-        description: "Topical antibiotic for acne vulgaris treatment",
-      },
-      {
-        name: "Ketoconazole 2% Shampoo",
-        description: "Antifungal for seborrhoeic dermatitis and dandruff",
-      },
-      {
-        name: "Tacrolimus 0.03% Ointment",
-        description: "Calcineurin inhibitor for atopic dermatitis",
-      },
-    ],
+    description: "Advanced skincare formulations addressing a broad spectrum of dermal conditions.",
+    productCount: 8,
   },
   {
+    slug: "gastroenterology",
+    icon: FlaskConical,
+    name: "Gastroenterology",
+    description: "Sustained medicines for treatment of renal disorders, hyperacidity and reflux.",
+    productCount: 8,
+  },
+  {
+    slug: "anti-diabetic",
+    icon: Pill,
+    name: "Anti Diabetic",
+    description: "Medicines to stabilize and control blood glucose levels effectively.",
+    productCount: 8,
+  },
+  {
+    slug: "orthopaedic",
+    icon: Bone,
+    name: "Orthopaedic",
+    description: "A dedicated unit for bone care and musculoskeletal health.",
+    productCount: 8,
+  },
+  {
+    slug: "gynaecology",
+    icon: Venus,
+    name: "Gynaecology",
+    description: "Medical care for women during pregnancy, childbirth and postpartum days.",
+    productCount: 8,
+  },
+  {
+    slug: "urology",
+    icon: FlaskConical,
+    name: "Urology",
+    description: "Formulations exceeding industry benchmarks for urological health.",
+    productCount: 8,
+  },
+  {
+    slug: "pediatrics",
     icon: Baby,
     name: "Pediatrics",
-    description:
-      "Gentle, precision-dosed therapeutics designed for the unique needs of children.",
-    products: [
-      {
-        name: "Amoxicillin 125 mg/5 ml",
-        description: "Broad-spectrum antibiotic suspension for infections",
-      },
-      {
-        name: "Paracetamol 120 mg/5 ml",
-        description: "Antipyretic and analgesic drops for fever relief",
-      },
-      {
-        name: "Zinc Sulphate 10 mg/5 ml",
-        description: "Micronutrient syrup for diarrhoea management",
-      },
-      {
-        name: "Montelukast 4 mg Granules",
-        description: "Leukotriene receptor antagonist for paediatric asthma",
-      },
-    ],
+    description: "Gentle, precision-dosed therapeutics designed for the unique needs of children.",
+    productCount: 8,
   },
   {
+    slug: "nutraceuticals",
     icon: Leaf,
     name: "Nutraceuticals",
-    description:
-      "Science-backed nutritional supplements to support everyday wellness and vitality.",
-    products: [
-      {
-        name: "OmegaGuard Softgels",
-        description: "Ultra-pure Omega-3 concentrate for cardiovascular health",
-      },
-      {
-        name: "CalciMax D3 Tablets",
-        description: "Calcium + Vitamin D3 for bone density maintenance",
-      },
-      {
-        name: "MultiVit Forte",
-        description: "Complete multivitamin complex for daily micronutrient needs",
-      },
-      {
-        name: "Iron-Folic Syrup",
-        description: "Iron + folic acid supplement for anaemia management",
-      },
-    ],
+    description: "Science-backed nutritional supplements to support everyday wellness.",
+    productCount: 8,
   },
   {
+    slug: "ophthalmology",
     icon: Eye,
     name: "Ophthalmology",
-    description:
-      "Ophthalmic solutions engineered for superior eye health and visual comfort.",
-    products: [
-      {
-        name: "Moxifloxacin 0.5% Eye Drops",
-        description: "Broad-spectrum antibiotic for bacterial conjunctivitis",
-      },
-      {
-        name: "Carboxymethylcellulose 0.5%",
-        description: "Lubricant eye drops for dry eye syndrome relief",
-      },
-      {
-        name: "Timolol 0.5% Eye Drops",
-        description: "Beta-blocker for intraocular pressure reduction",
-      },
-      {
-        name: "Prednisolone Acetate 1%",
-        description: "Corticosteroid eye drops for ocular inflammation",
-      },
-    ],
+    description: "Ophthalmic solutions engineered for superior eye health and visual comfort.",
+    productCount: 8,
   },
 ];
 
@@ -179,19 +112,10 @@ const DIVISIONS: Division[] = [
    Main Section
 ───────────────────────────────────────────────────────── */
 export default function Divisions() {
-  // clicked = locked open; null = none locked
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  // hovered = preview on hover
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-
-  const isExpanded = (i: number) =>
-    activeIndex === i || hoveredIndex === i;
-
-  const handleClick = (i: number) =>
-    setActiveIndex((prev) => (prev === i ? null : i));
+  const [hoveredSlug, setHoveredSlug] = useState<string | null>(null);
 
   return (
-    <section className="w-full bg-white py-24">
+    <section id="divisions" className="w-full bg-white py-24">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
 
         {/* ── Section Header ── */}
@@ -210,17 +134,15 @@ export default function Divisions() {
           </p>
         </div>
 
-        {/* ── Division Cards Grid ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {DIVISIONS.map((division, i) => (
+        {/* ── Cards Grid ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          {DIVISIONS.map((division) => (
             <DivisionCard
-              key={division.name}
+              key={division.slug}
               division={division}
-              expanded={isExpanded(i)}
-              active={activeIndex === i}
-              onMouseEnter={() => setHoveredIndex(i)}
-              onMouseLeave={() => setHoveredIndex(null)}
-              onClick={() => handleClick(i)}
+              hovered={hoveredSlug === division.slug}
+              onMouseEnter={() => setHoveredSlug(division.slug)}
+              onMouseLeave={() => setHoveredSlug(null)}
             />
           ))}
         </div>
@@ -230,161 +152,90 @@ export default function Divisions() {
 }
 
 /* ─────────────────────────────────────────────────────────
-   Division Card (expandable)
+   Division Card
 ───────────────────────────────────────────────────────── */
 interface DivisionCardProps {
-  division: Division;
-  expanded: boolean;
-  active: boolean;
+  division: DivisionCard;
+  hovered: boolean;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
-  onClick: () => void;
 }
 
 function DivisionCard({
   division,
-  expanded,
-  active,
+  hovered,
   onMouseEnter,
   onMouseLeave,
-  onClick,
 }: DivisionCardProps) {
   const Icon = division.icon;
 
   return (
-    <div
+    <Link
+      href={`/divisions/${division.slug}`}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      onClick={onClick}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => e.key === "Enter" && onClick()}
-      aria-expanded={expanded}
       className={[
-        "relative rounded-2xl border p-7 cursor-pointer select-none",
-        "transition-all duration-300 ease-in-out overflow-hidden",
+        "group relative flex flex-col rounded-2xl border p-7 overflow-hidden",
+        "transition-all duration-300 ease-in-out",
         "shadow-[0_2px_12px_rgba(0,0,0,0.05)]",
-        active
-          ? "border-[#F26522] shadow-[0_8px_32px_rgba(242,101,34,0.15)] bg-white"
-          : expanded
-          ? "border-[#F26522]/40 shadow-[0_8px_24px_rgba(0,0,0,0.08)] bg-white"
+        hovered
+          ? "border-[#F26522]/50 shadow-[0_10px_36px_rgba(242,101,34,0.12)] -translate-y-1 bg-white"
           : "border-gray-100 bg-white hover:shadow-[0_6px_20px_rgba(0,0,0,0.07)]",
       ].join(" ")}
     >
-      {/* Top accent bar — slides in when expanded */}
+      {/* Top accent — slides in on hover */}
       <span
         className={[
           "absolute top-0 left-0 h-[3px] bg-[#F26522] rounded-t-2xl",
           "transition-all duration-300 ease-in-out",
-          expanded ? "w-full" : "w-0",
+          hovered ? "w-full" : "w-0",
         ].join(" ")}
       />
 
-      {/* ── Card Header ── */}
-      <div className="flex items-start justify-between gap-4 mb-4">
-        <div className="flex items-center gap-4">
-          {/* Icon */}
-          <div
-            className={[
-              "w-[48px] h-[48px] rounded-[14px] flex items-center justify-center flex-shrink-0",
-              "transition-colors duration-300",
-              expanded
-                ? "bg-[#F26522]/12"
-                : "bg-[#F26522]/7 group-hover:bg-[#F26522]/12",
-            ].join(" ")}
-          >
-            <Icon
-              size={22}
-              className={[
-                "transition-colors duration-300",
-                expanded ? "text-[#F26522]" : "text-[#F26522]/70",
-              ].join(" ")}
-              aria-hidden
-            />
-          </div>
-
-          {/* Name */}
-          <h3 className="font-barlow font-bold text-[19px] text-[#1B2B4B] tracking-tight leading-tight">
-            {division.name}
-          </h3>
-        </div>
-
-        {/* Chevron indicator */}
-        <ChevronDown
-          size={16}
+      {/* Icon */}
+      <div
+        className={[
+          "w-[50px] h-[50px] rounded-[14px] flex items-center justify-center mb-5 flex-shrink-0",
+          "transition-colors duration-300",
+          hovered ? "bg-[#F26522]/14" : "bg-[#F26522]/8",
+        ].join(" ")}
+      >
+        <Icon
+          size={22}
           className={[
-            "text-gray-400 flex-shrink-0 mt-1 transition-transform duration-300",
-            expanded ? "rotate-180 text-[#F26522]" : "",
+            "transition-colors duration-300",
+            hovered ? "text-[#F26522]" : "text-[#F26522]/65",
           ].join(" ")}
+          aria-hidden
         />
       </div>
 
+      {/* Name */}
+      <h3 className="font-barlow font-bold text-[18px] text-[#1B2B4B] tracking-tight leading-tight mb-2">
+        {division.name}
+      </h3>
+
       {/* Description */}
-      <p className="font-inter text-[13.5px] leading-[1.7] text-gray-400 mb-0">
+      <p className="font-inter text-[13px] leading-[1.7] text-gray-400 flex-1">
         {division.description}
       </p>
 
-      {/* ── Product Cards — slides open ── */}
-      <div
-        className={[
-          "overflow-hidden transition-all duration-300 ease-in-out",
-          expanded
-            ? "max-h-[800px] opacity-100 mt-5 pt-5 border-t border-gray-100"
-            : "max-h-0 opacity-0",
-        ].join(" ")}
-      >
-        <div className="grid grid-cols-2 gap-3">
-          {division.products.map((product) => (
-            <ProductCard key={product.name} product={product} />
-          ))}
-        </div>
-
-        {/* See all link */}
-        <button
-          onClick={(e) => e.stopPropagation()}
-          className="inline-flex items-center gap-1.5 font-inter text-[11px] font-semibold tracking-[0.14em] uppercase text-[#F26522] mt-4 hover:gap-3 transition-all duration-200"
+      {/* Footer */}
+      <div className="flex items-center justify-between mt-5 pt-5 border-t border-gray-100">
+        <span className="font-inter text-[11.5px] text-gray-400">
+          <span className="font-semibold text-[#1B2B4B]">{division.productCount}</span> products
+        </span>
+        <span
+          className={[
+            "inline-flex items-center gap-1 font-inter text-[11px] font-semibold tracking-[0.12em] uppercase text-[#F26522]",
+            "transition-all duration-200",
+            hovered ? "gap-2" : "gap-1",
+          ].join(" ")}
         >
-          View All Products
+          Explore
           <ArrowRight size={11} />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-/* ─────────────────────────────────────────────────────────
-   Product Card — inside an expanded division card
-───────────────────────────────────────────────────────── */
-function ProductCard({ product }: { product: Product }) {
-  return (
-    <div
-      onClick={(e) => e.stopPropagation()}
-      className="group/card relative flex flex-col bg-[#F9FAFB] hover:bg-white border border-transparent hover:border-[#F26522]/20 rounded-xl overflow-hidden transition-all duration-250 hover:shadow-[0_4px_16px_rgba(0,0,0,0.07)] cursor-default"
-    >
-      {/* Image placeholder */}
-      <div className="w-full h-[64px] bg-gray-100 group-hover/card:bg-[#F26522]/6 flex items-center justify-center transition-colors duration-250">
-        <span className="font-inter text-[8.5px] tracking-[0.16em] text-gray-300 uppercase">
-          Product Image
         </span>
       </div>
-
-      {/* Content */}
-      <div className="p-3 flex flex-col gap-1 flex-1">
-        <span className="font-barlow font-bold text-[12.5px] text-[#1B2B4B] leading-tight">
-          {product.name}
-        </span>
-        <span className="font-inter text-[11px] leading-[1.55] text-gray-400">
-          {product.description}
-        </span>
-      </div>
-
-      {/* View Details CTA */}
-      <div className="px-3 pb-3">
-        <span className="inline-flex items-center gap-1 font-inter text-[10px] font-semibold tracking-[0.12em] uppercase text-[#F26522] group-hover/card:gap-2 transition-all duration-200">
-          View Details
-          <ArrowRight size={9} />
-        </span>
-      </div>
-    </div>
+    </Link>
   );
 }
