@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Navbar from "./components/Navbar";
+import { divisions } from "./data/divisions";
 
 /* ─────────────────────────────────────────────────────────
    Fade-in on scroll — wraps any section content
@@ -209,44 +210,6 @@ function KeyStats() {
 /* ─────────────────────────────────────────────────────────
    Section 4 — Divisions
 ───────────────────────────────────────────────────────── */
-const DIVISIONS = [
-  {
-    name: "Neurology",
-    description: "Treating ailments related to anxiety, depression and OCD",
-  },
-  {
-    name: "Gastroenterology",
-    description:
-      "Sustained medicines for treatment of renal disorders, hyperacidity and oesophagitis reflux",
-  },
-  {
-    name: "Cardiology",
-    description:
-      "Medicines to cure hypertension, manage heart rhythms, and blood pressure",
-  },
-  {
-    name: "Anti Diabetic",
-    description: "Medicines to stabilize and control blood glucose levels",
-  },
-  {
-    name: "Orthopaedic",
-    description: "A dedicated unit for bone care",
-  },
-  {
-    name: "Gynaecology",
-    description:
-      "Medical care for women during pregnancy, childbirth and postpartum days",
-  },
-  {
-    name: "Urology",
-    description: "Formulations exceeding industry benchmarks",
-  },
-  {
-    name: "Dermatology",
-    description:
-      "A mix of chemical and natural formulations for healthier skin",
-  },
-];
 
 function DivisionsSection() {
   return (
@@ -263,8 +226,8 @@ function DivisionsSection() {
         </FadeIn>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-14">
-          {DIVISIONS.map((div, i) => (
-            <FadeIn key={div.name} delay={i * 55} className="h-full">
+          {divisions.map((div, i) => (
+            <FadeIn key={div.slug} delay={i * 55} className="h-full">
               <div className="group relative border border-gray-200 rounded-xl p-6 flex flex-col gap-3 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg cursor-default h-full overflow-hidden">
                 <div className="absolute top-0 left-0 right-0 h-[3px] bg-brand rounded-t-xl scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
                 <h3 className="font-barlow font-bold text-navy text-[17px]">
@@ -279,9 +242,12 @@ function DivisionsSection() {
         </div>
 
         <FadeIn className="flex justify-center">
-          <button className="font-inter text-[11.5px] font-bold tracking-[0.25em] uppercase text-white bg-navy px-10 py-[15px] rounded-[8px] hover:bg-brand transition-colors duration-300">
+          <Link
+            href="/divisions"
+            className="font-inter text-[11.5px] font-bold tracking-[0.25em] uppercase text-white bg-navy px-10 py-[15px] rounded-[8px] hover:bg-brand transition-colors duration-300"
+          >
             Explore All Divisions
-          </button>
+          </Link>
         </FadeIn>
       </div>
     </section>

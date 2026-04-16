@@ -1,11 +1,12 @@
 import Link from "next/link";
+import { ChevronDown } from "lucide-react";
+import { divisions } from "@/app/data/divisions";
 
 const navLinks = [
-  { label: "About Us", href: "#" },
-  { label: "Division", href: "#" },
-  { label: "Manufacturing", href: "#" },
-  { label: "Our Presence", href: "#" },
-  { label: "Career", href: "#" },
+  { label: "About Us", href: "/about" },
+  { label: "Manufacturing", href: "/manufacturing" },
+  { label: "Our Presence", href: "/presence" },
+  { label: "Career", href: "/career" },
 ];
 
 export default function Navbar() {
@@ -14,10 +15,10 @@ export default function Navbar() {
       <nav className="max-w-[1440px] mx-auto px-8 xl:px-16 h-[72px] flex items-center justify-between gap-8">
         {/* Logo */}
         <Link href="/" className="flex items-center flex-shrink-0 relative">
-          <span className="font-barlow font-black text-[26px] leading-none tracking-tight text-[#F26522]">
+          <span className="font-barlow font-black text-[26px] leading-none tracking-tight text-brand">
             Tas
           </span>
-          <span className="font-barlow font-black text-[26px] leading-none tracking-tight text-[#1B2B4B]">
+          <span className="font-barlow font-black text-[26px] leading-none tracking-tight text-navy">
             &nbsp;med
           </span>
           <BirdIcon />
@@ -25,11 +26,50 @@ export default function Navbar() {
 
         {/* Centered Nav Links */}
         <ul className="hidden lg:flex items-center gap-9 absolute left-1/2 -translate-x-1/2">
+          {/* Divisions — dropdown */}
+          <li className="relative group">
+            <Link
+              href="/divisions"
+              className="flex items-center gap-1 font-inter text-[13.5px] font-medium text-navy/85 hover:text-brand transition-colors duration-200 whitespace-nowrap py-2"
+            >
+              Divisions
+              <ChevronDown
+                size={13}
+                className="mt-px opacity-60 group-hover:opacity-100 group-hover:rotate-180 transition-all duration-200"
+              />
+            </Link>
+
+            {/*
+              Invisible bridge fills the gap between the trigger and the panel
+              so the hover state stays active while the cursor moves down.
+            */}
+            <div className="absolute top-full left-1/2 -translate-x-1/2 w-56 pt-2
+                            invisible opacity-0 translate-y-1
+                            group-hover:visible group-hover:opacity-100 group-hover:translate-y-0
+                            transition-all duration-200 pointer-events-none group-hover:pointer-events-auto">
+              <div className="bg-white rounded-xl border border-gray-100 shadow-[0_8px_32px_rgba(0,0,0,0.10)] overflow-hidden py-2">
+                {divisions.map((div) => (
+                  <Link
+                    key={div.slug}
+                    href={`/divisions/${div.slug}`}
+                    className="flex items-center gap-3 px-4 py-2.5 font-inter text-[13px] text-navy/75 hover:text-brand hover:bg-gray-50 transition-colors duration-150"
+                  >
+                    <div className="w-[28px] h-[28px] rounded-[8px] bg-brand/[0.07] flex items-center justify-center flex-shrink-0">
+                      <div.icon size={14} className="text-brand stroke-[1.8]" aria-hidden="true" />
+                    </div>
+                    {div.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </li>
+
+          {/* Other links */}
           {navLinks.map((link) => (
             <li key={link.label}>
               <Link
                 href={link.href}
-                className="font-inter text-[13.5px] font-medium text-[#1B2B4B]/85 hover:text-[#F26522] transition-colors duration-200 whitespace-nowrap"
+                className="font-inter text-[13.5px] font-medium text-navy/85 hover:text-brand transition-colors duration-200 whitespace-nowrap"
               >
                 {link.label}
               </Link>
@@ -41,13 +81,13 @@ export default function Navbar() {
         <div className="flex items-center gap-2.5 flex-shrink-0">
           <button
             aria-label="Search"
-            className="w-[40px] h-[40px] rounded-full border border-gray-200 flex items-center justify-center text-[#1B2B4B]/70 hover:border-[#F26522] hover:text-[#F26522] transition-all duration-200"
+            className="w-[40px] h-[40px] rounded-full border border-gray-200 flex items-center justify-center text-navy/70 hover:border-brand hover:text-brand transition-all duration-200"
           >
             <SearchIcon />
           </button>
           <button
             aria-label="Contact"
-            className="w-[40px] h-[40px] rounded-full border border-gray-200 flex items-center justify-center text-[#1B2B4B]/70 hover:border-[#F26522] hover:text-[#F26522] transition-all duration-200"
+            className="w-[40px] h-[40px] rounded-full border border-gray-200 flex items-center justify-center text-navy/70 hover:border-brand hover:text-brand transition-all duration-200"
           >
             <PhoneIcon />
           </button>
@@ -67,7 +107,6 @@ function BirdIcon() {
       fill="none"
       aria-hidden="true"
     >
-      {/* Upper wing sweep */}
       <path
         d="M2 13 C5 9.5 8.5 6.5 12 5 C14 4.2 16.5 4.8 18 6.5"
         stroke="#F26522"
@@ -75,7 +114,6 @@ function BirdIcon() {
         strokeLinecap="round"
         fill="none"
       />
-      {/* Wing tip fold */}
       <path
         d="M11.5 5 C13.5 3.2 16 3.8 18 5.5 C17.5 7.5 15.5 8.5 13 8"
         stroke="#F26522"
