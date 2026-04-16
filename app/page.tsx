@@ -73,7 +73,6 @@ export default function Home() {
       <CompanyPositioning />
       <KeyStats />
       <DivisionsSection />
-      <ManufacturingTeaser />
       <OurPresence />
       <JourneyTimeline />
       <CareersPreview />
@@ -254,38 +253,6 @@ function DivisionsSection() {
   );
 }
 
-/* ─────────────────────────────────────────────────────────
-   Section 5 — Manufacturing Teaser
-───────────────────────────────────────────────────────── */
-function ManufacturingTeaser() {
-  return (
-    <section className="bg-navy py-24 md:py-32 px-6">
-      <FadeIn className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-14 items-center">
-        <div>
-          <SectionLabel text="Manufacturing" />
-          <h2
-            className="font-barlow font-black text-white leading-tight mb-6"
-            style={{ fontSize: "clamp(26px, 3.5vw, 46px)" }}
-          >
-            2 GMP Certified Manufacturing Units
-          </h2>
-          <p className="font-inter text-[15.5px] leading-[1.85] text-white/55 mb-10 max-w-[460px]">
-            WHO GMP Certified and Schedule-M compliant facilities built to
-            deliver quality at scale.
-          </p>
-          <button className="font-inter text-[11.5px] font-bold tracking-[0.25em] uppercase text-white bg-brand px-10 py-[15px] rounded-[8px] hover:bg-white hover:text-navy transition-colors duration-300">
-            Learn More
-          </button>
-        </div>
-        <div className="w-full aspect-[4/3] rounded-2xl bg-white/8 border border-white/12 flex items-center justify-center">
-          <span className="font-inter text-[11px] tracking-[0.18em] text-white/25 uppercase">
-            Manufacturing Image
-          </span>
-        </div>
-      </FadeIn>
-    </section>
-  );
-}
 
 /* ─────────────────────────────────────────────────────────
    Section 6 — Our Presence
