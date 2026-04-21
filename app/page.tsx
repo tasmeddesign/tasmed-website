@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Navbar from "./components/Navbar";
 import { divisions } from "./data/divisions";
+import IndiaMap from "./components/IndiaMap";
 
 /* ─────────────────────────────────────────────────────────
    Fade-in on scroll — wraps any section content
@@ -257,39 +258,28 @@ function DivisionsSection() {
 /* ─────────────────────────────────────────────────────────
    Section 6 — Our Presence
 ───────────────────────────────────────────────────────── */
-const STATES = [
-  "J&K", "Punjab", "Rajasthan", "Gujarat", "Haryana",
-  "Chandigarh", "UP", "New Delhi", "Himachal Pradesh",
-  "Madhya Pradesh", "Maharashtra", "Karnataka", "Telangana",
-  "Andhra Pradesh", "Tamil Nadu", "Odisha", "Bihar",
-  "Jharkhand", "West Bengal", "Assam",
-];
-
 function OurPresence() {
   return (
     <section className="bg-white py-24 md:py-32 px-6">
-      <FadeIn className="max-w-5xl mx-auto text-center">
-        <SectionLabel text="Our Presence" />
-        <h2
-          className="font-barlow font-black text-navy leading-tight mb-14"
-          style={{ fontSize: "clamp(28px, 3.8vw, 52px)" }}
-        >
-          Serving 20+ States Across India
-        </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-14">
-          {STATES.map((state) => (
-            <div
-              key={state}
-              className="border border-gray-200 rounded-lg py-3 px-4 font-inter text-[13px] text-navy/75 hover:border-brand hover:text-brand transition-colors duration-200 cursor-default"
-            >
-              {state}
-            </div>
-          ))}
-        </div>
-        <button className="font-inter text-[11.5px] font-bold tracking-[0.25em] uppercase text-navy border-2 border-navy px-10 py-[14px] rounded-[8px] hover:bg-navy hover:text-white transition-colors duration-300">
-          View Full Presence
-        </button>
-      </FadeIn>
+      <div className="max-w-4xl mx-auto">
+        <FadeIn className="text-center mb-14">
+          <SectionLabel text="Our Presence" />
+          <h2
+            className="font-barlow font-black text-navy leading-tight mb-5"
+            style={{ fontSize: "clamp(28px, 3.8vw, 52px)" }}
+          >
+            Serving 20+ States Across India
+          </h2>
+          <p className="font-inter text-[15px] leading-[1.8] text-gray-400 max-w-[440px] mx-auto">
+            From the Himalayas to the southern coasts — our medicines reach
+            patients in every major region of the country.
+          </p>
+        </FadeIn>
+
+        <FadeIn delay={150}>
+          <IndiaMap />
+        </FadeIn>
+      </div>
     </section>
   );
 }
