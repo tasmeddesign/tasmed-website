@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Navbar from "./components/Navbar";
 import { divisions } from "./data/divisions";
-import IndiaMap from "./components/IndiaMap";
+import IndiaPresenceMap from "./components/IndiaPresenceMap";
 
 /* ─────────────────────────────────────────────────────────
    Fade-in on scroll — wraps any section content
@@ -277,7 +277,7 @@ function OurPresence() {
         </FadeIn>
 
         <FadeIn delay={150}>
-          <IndiaMap />
+          <IndiaPresenceMap />
         </FadeIn>
       </div>
     </section>
