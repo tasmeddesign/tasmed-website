@@ -252,26 +252,6 @@ function HeroV2() {
             <circle cx="28"  cy="598" r="3"   fill="white"   fillOpacity="0.18" />
           </svg>
 
-          {/* Floating card: WHO GMP — bottom-left */}
-          <div
-            className="absolute bottom-10 left-8
-                       bg-white/95 backdrop-blur-sm rounded-2xl px-5 py-4
-                       shadow-[0_12px_40px_rgba(0,0,0,0.30)]
-                       flex items-center gap-3.5"
-          >
-            <div className="w-10 h-10 rounded-full bg-brand/10 flex items-center justify-center flex-shrink-0">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                   stroke="#F26522" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                <polyline points="9,12 11,14 15,10" />
-              </svg>
-            </div>
-            <div>
-              <p className="font-barlow font-black text-navy text-[15px] leading-tight">WHO GMP</p>
-              <p className="font-inter text-[10px] text-gray-400 tracking-[0.08em] uppercase">Certified</p>
-            </div>
-          </div>
-
           {/* Floating card: 30+ Years — top-right */}
           <div
             className="absolute top-12 right-8
