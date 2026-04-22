@@ -83,55 +83,216 @@ export default function Home() {
 }
 
 /* ─────────────────────────────────────────────────────────
-   Section 1 — Hero
+   Section 1 — Hero  (split layout)
 ───────────────────────────────────────────────────────── */
 function HeroV2() {
   return (
-    <section className="relative w-full min-h-[calc(100vh-72px)] flex flex-col items-center justify-center bg-white overflow-hidden px-6 py-20 md:py-28">
-      <div className="relative z-10 flex flex-col items-center text-center w-full max-w-[680px] mx-auto">
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2.5 border border-gray-200 rounded-full px-5 py-[9px] mb-10 shadow-[0_1px_4px_rgba(0,0,0,0.05)]">
-          <span className="w-[7px] h-[7px] rounded-full bg-brand flex-shrink-0" />
-          <span className="font-inter text-[10.5px] font-semibold tracking-[0.22em] text-navy uppercase">
-            Premium Care Since 1994
-          </span>
-        </div>
+    <section className="w-full overflow-hidden">
+      <div className="flex flex-col md:flex-row min-h-[calc(100vh-72px)]">
 
-        {/* Headline */}
-        <h1 className="font-barlow font-black tracking-tight leading-[1.02] mb-8">
-          <span
-            className="block text-navy whitespace-nowrap"
-            style={{ fontSize: "clamp(32px, 5.5vw, 92px)" }}
+        {/* ── LEFT: Text panel ──────────────────────────────── */}
+        <div
+          className="relative flex flex-col justify-center
+                     w-full md:w-[56%]
+                     bg-white
+                     px-8 sm:px-12 lg:px-16 xl:px-24
+                     pt-16 pb-20 md:pt-0 md:pb-14"
+        >
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2.5 border border-gray-200 rounded-full
+                          px-5 py-[9px] mb-9 w-fit
+                          shadow-[0_1px_4px_rgba(0,0,0,0.05)]">
+            <span className="w-[7px] h-[7px] rounded-full bg-brand flex-shrink-0" />
+            <span className="font-inter text-[10.5px] font-semibold tracking-[0.22em] text-navy uppercase">
+              Premium Care Since 1994
+            </span>
+          </div>
+
+          {/* Headline */}
+          <h1
+            className="font-barlow font-black text-navy leading-[1.03] mb-7"
+            style={{ fontSize: "clamp(38px, 4.2vw, 74px)" }}
           >
             Committed Towards
-          </span>
-          <span
-            className="block text-brand whitespace-nowrap"
-            style={{ fontSize: "clamp(32px, 5.5vw, 92px)" }}
+            <br />
+            <span className="text-brand">Healthier Life.</span>
+          </h1>
+
+          {/* Subheading */}
+          <p className="font-inter text-[15.5px] leading-[1.82] text-gray-400 max-w-[420px] mb-10">
+            A fast-evolving pharmaceutical company applying research,
+            technology and science to develop high-quality medicines for
+            chronic ailments across India.
+          </p>
+
+          {/* CTAs */}
+          <div className="flex flex-wrap items-center gap-4 mb-14">
+            <Link
+              href="/about"
+              className="font-inter text-[11.5px] font-bold tracking-[0.25em] uppercase
+                         text-white bg-navy px-10 py-[15px] rounded-[8px]
+                         hover:bg-brand transition-colors duration-300 shadow-sm"
+            >
+              Know More
+            </Link>
+            <Link
+              href="/divisions"
+              className="font-inter text-[11.5px] font-bold tracking-[0.25em] uppercase
+                         text-navy border-2 border-gray-200 px-10 py-[15px] rounded-[8px]
+                         hover:border-navy/40 transition-colors duration-300"
+            >
+              Our Divisions
+            </Link>
+          </div>
+
+          {/* Trust strip */}
+          <div className="flex items-stretch border-t border-gray-100 pt-8">
+            {(
+              [
+                { value: "30+",  label: "Years"     },
+                { value: "280+", label: "Products"  },
+                { value: "980+", label: "Stockists" },
+              ] as const
+            ).map((s, i) => (
+              <div
+                key={s.label}
+                className={`flex flex-col px-7 first:pl-0 ${
+                  i > 0 ? "border-l border-gray-200" : ""
+                }`}
+              >
+                <span className="font-barlow font-black text-navy text-[26px] leading-none">
+                  {s.value}
+                </span>
+                <span className="font-inter text-[11px] tracking-[0.1em] text-gray-400 uppercase mt-1">
+                  {s.label}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Scroll indicator */}
+          <div className="hidden md:flex flex-col items-center gap-2.5 absolute bottom-7 left-1/2 -translate-x-1/2">
+            <span className="font-inter text-[10.5px] tracking-[0.14em] text-gray-400 uppercase">
+              Scroll
+            </span>
+            <div className="w-px h-10 bg-gradient-to-b from-gray-300 to-transparent animate-scrollPulse origin-top" />
+          </div>
+        </div>
+
+        {/* ── RIGHT: Visual panel ───────────────────────────── */}
+        {/*
+          TO SWAP IN A REAL HERO PHOTO:
+          1. Drop the image into public/images/hero.jpg
+          2. Add at top of file: import Image from "next/image"
+          3. Replace the <svg> block below with:
+               <Image
+                 src="/images/hero.jpg"
+                 alt="Tasmed pharmaceutical research"
+                 fill
+                 className="object-cover object-center"
+                 priority
+               />
+          The two floating cards will stay on top of the photo.
+        */}
+        <div
+          className="relative w-full md:w-[44%] min-h-[56vw] md:min-h-0
+                     overflow-hidden bg-[#0e1c34]"
+        >
+          {/* Premium placeholder visual */}
+          <svg
+            viewBox="0 0 520 700"
+            className="absolute inset-0 w-full h-full"
+            preserveAspectRatio="xMidYMid slice"
+            aria-hidden="true"
           >
-            Healthier Life.
-          </span>
-        </h1>
+            <defs>
+              {/* Orange glow — upper right */}
+              <radialGradient id="hg1" cx="75%" cy="22%" r="58%">
+                <stop offset="0%"   stopColor="#F26522" stopOpacity="0.28" />
+                <stop offset="100%" stopColor="#F26522" stopOpacity="0"    />
+              </radialGradient>
+              {/* Deep shadow — lower left */}
+              <radialGradient id="hg2" cx="15%" cy="85%" r="42%">
+                <stop offset="0%"   stopColor="#223057" stopOpacity="0.9" />
+                <stop offset="100%" stopColor="#0e1c34" stopOpacity="0"   />
+              </radialGradient>
+            </defs>
 
-        {/* Subheading */}
-        <p className="font-inter text-[15px] leading-[1.8] text-[#999999] max-w-[460px] mb-12">
-          Tasmed is a fast evolving pharmaceuticals company in India. We apply
-          research, technology and science to innovate and develop high quality
-          medicines to treat chronic ailments.
-        </p>
+            <rect width="520" height="700" fill="#0e1c34" />
+            <rect width="520" height="700" fill="url(#hg1)" />
+            <rect width="520" height="700" fill="url(#hg2)" />
 
-        {/* CTA */}
-        <button className="font-inter text-[11.5px] font-bold tracking-[0.25em] uppercase text-white bg-navy px-12 py-[15px] rounded-[8px] hover:bg-brand transition-colors duration-300 shadow-sm">
-          Know More
-        </button>
-      </div>
+            {/* Concentric rings */}
+            <circle cx="330" cy="290" r="218" fill="none" stroke="white"   strokeOpacity="0.04" strokeWidth="1"   />
+            <circle cx="330" cy="290" r="158" fill="none" stroke="#F26522" strokeOpacity="0.07" strokeWidth="1"   />
+            <circle cx="330" cy="290" r="88"  fill="none" stroke="white"   strokeOpacity="0.07" strokeWidth="0.8" />
+            <circle cx="330" cy="290" r="36"  fill="#F26522" fillOpacity="0.08" />
 
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3">
-        <span className="font-inter text-[11px] tracking-[0.12em] text-[#999999] uppercase">
-          Scroll to explore
-        </span>
-        <div className="w-px h-[52px] bg-gradient-to-b from-gray-300 to-transparent animate-scrollPulse origin-top" />
+            {/* Diagonal light band */}
+            <line x1="-40" y1="700" x2="560" y2="-20" stroke="white" strokeOpacity="0.025" strokeWidth="90" />
+
+            {/* Molecule cluster */}
+            <line x1="105" y1="530" x2="172" y2="462" stroke="white" strokeOpacity="0.12" strokeWidth="1" />
+            <line x1="172" y1="462" x2="248" y2="508" stroke="white" strokeOpacity="0.12" strokeWidth="1" />
+            <line x1="172" y1="462" x2="172" y2="378" stroke="white" strokeOpacity="0.08" strokeWidth="1" />
+            <circle cx="105" cy="530" r="5.5" fill="white"   fillOpacity="0.15" />
+            <circle cx="172" cy="462" r="10"  fill="#F26522" fillOpacity="0.22" />
+            <circle cx="248" cy="508" r="5.5" fill="white"   fillOpacity="0.15" />
+            <circle cx="172" cy="378" r="7"   fill="white"   fillOpacity="0.1"  />
+
+            {/* Capsule silhouette */}
+            <rect x="372" y="582" width="112" height="46" rx="23" fill="none" stroke="#F26522" strokeOpacity="0.2" strokeWidth="1.5" />
+            <rect x="428" y="582" width="56"  height="46" fill="#F26522" fillOpacity="0.08" />
+            <line x1="428" y1="582" x2="428" y2="628" stroke="#F26522" strokeOpacity="0.25" strokeWidth="1.5" />
+
+            {/* Accent dots */}
+            <circle cx="452" cy="162" r="3.5" fill="#F26522" fillOpacity="0.50" />
+            <circle cx="60"  cy="342" r="2.5" fill="white"   fillOpacity="0.30" />
+            <circle cx="482" cy="422" r="4"   fill="#F26522" fillOpacity="0.28" />
+            <circle cx="28"  cy="598" r="3"   fill="white"   fillOpacity="0.18" />
+          </svg>
+
+          {/* Floating card: WHO GMP — bottom-left */}
+          <div
+            className="absolute bottom-10 left-8
+                       bg-white/95 backdrop-blur-sm rounded-2xl px-5 py-4
+                       shadow-[0_12px_40px_rgba(0,0,0,0.30)]
+                       flex items-center gap-3.5"
+          >
+            <div className="w-10 h-10 rounded-full bg-brand/10 flex items-center justify-center flex-shrink-0">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                   stroke="#F26522" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                <polyline points="9,12 11,14 15,10" />
+              </svg>
+            </div>
+            <div>
+              <p className="font-barlow font-black text-navy text-[15px] leading-tight">WHO GMP</p>
+              <p className="font-inter text-[10px] text-gray-400 tracking-[0.08em] uppercase">Certified</p>
+            </div>
+          </div>
+
+          {/* Floating card: 30+ Years — top-right */}
+          <div
+            className="absolute top-12 right-8
+                       bg-brand rounded-2xl px-5 py-4
+                       shadow-[0_12px_40px_rgba(242,101,34,0.40)]"
+          >
+            <p className="font-barlow font-black text-white text-[30px] leading-none">30+</p>
+            <p className="font-inter text-[10px] text-white/75 tracking-[0.08em] uppercase mt-0.5">
+              Years of Trust
+            </p>
+          </div>
+
+          {/* Left-edge fade (desktop only — softens the hard seam) */}
+          <div className="hidden md:block absolute inset-y-0 left-0 w-12
+                          bg-gradient-to-r from-white/[0.03] to-transparent pointer-events-none" />
+
+          {/* Bottom fade */}
+          <div className="absolute inset-x-0 bottom-0 h-24
+                          bg-gradient-to-t from-[#0e1c34] to-transparent pointer-events-none" />
+        </div>
+
       </div>
     </section>
   );
@@ -142,7 +303,7 @@ function HeroV2() {
 ───────────────────────────────────────────────────────── */
 function CompanyPositioning() {
   return (
-    <section className="bg-white py-24 md:py-32 px-6">
+    <section className="bg-white py-20 md:py-28 px-6">
       <FadeIn className="max-w-[800px] mx-auto text-center">
         <SectionLabel text="Who We Are" />
         <h2
