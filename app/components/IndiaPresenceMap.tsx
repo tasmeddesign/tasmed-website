@@ -1,167 +1,113 @@
 "use client";
 
-import { useState, useRef, memo } from "react";
+import { useState, useRef } from "react";
 
 /* ═══════════════════════════════════════════════════════════
    HOW THIS MAP WORKS
-   ══════════════════════════════════════════════════════════
-   1. INDIA_POLYGON  — a ~70-point boundary polygon that traces
-      India's outline inside a "0 0 460 540" SVG viewBox.
+   ════════════════════════════════════════════════════════
 
-   2. insideIndia()  — classic ray-casting point-in-polygon test.
-      Returns true when a coordinate falls inside the polygon.
+   SILHOUETTE
+   ──────────
+   INDIA_PTS is a polygon tracing India's outer boundary
+   (clockwise from the SW Pakistan border corner).
+   Coordinate formula: x = (lon − 67) × 14, y = (38.5 − lat) × 15.5
+   ViewBox: "0 0 460 540"
 
-   3. DOTS           — computed ONCE at module load (not on every
-      render). A 10 px grid is scanned across India's bounding box;
-      every point that passes insideIndia() becomes a dot.
-      Result: ~850 dots that together form the India silhouette.
+   The polygon is converted to an SVG <path> used as a <clipPath>.
 
-   4. LOCATIONS      — the only array you edit to add / remove
-      brand markers. Each entry has an (x, y) in the same
-      viewBox coordinate space.
+   DOT PATTERN
+   ───────────
+   A single SVG <pattern> element defines a hexagonal (staggered-row)
+   dot tile:
+     · Tile size: 11 × 19.05 px
+     · Three circle positions per tile form a repeating hex grid:
+         (5.5, 4.76)  — row 1 centre
+         (0,  14.29)  — row 2 left edge
+         (11, 14.29)  — row 2 right edge
+     · Dot radius: 1.5 px   |   spacing: ~11 px horiz, ~9.5 px vert
 
-   Coordinate formula:
-      x = (longitude − 67) × 14
-      y = (38.5 − latitude) × 15.5
+   The hex pattern is applied to a full-viewBox <rect> that is then
+   clipped to the India silhouette. No JS loop, no square grid.
 
-   Example — Bengaluru (77.6 °E, 13 °N):
-      x = (77.6 − 67) × 14  =  148
-      y = (38.5 − 13)  × 15.5 =  395
-   ═══════════════════════════════════════════════════════════ */
+   TO CONTROL DOT DENSITY
+   ── Increase the tile width/height (e.g. 14 / 24.25) → fewer dots
+   ── Decrease (e.g. 9 / 15.59) → more dots
 
-/* ───────────────────────────────────────────────────────────
-   1. INDIA BOUNDARY POLYGON
-   ~70 points — enough resolution for a clean 10 px dot grid.
-   ViewBox coordinate system: "0 0 460 540"
-─────────────────────────────────────────────────────────── */
-const INDIA_POLYGON: [number, number][] = [
-  // ── Northwest / J&K ──
-  [95, 100], [90, 72], [98, 44], [112, 24], [130, 12],
-  [148,   8], [168,  8],
-  // ── Himalayan arc (east) ──
-  [186, 22], [200, 36], [214, 50],
-  [222, 70], [225, 100], [228, 136], [244, 158], [262, 178],
-  // ── Bihar / WB flat northern edge ──
-  [302, 178],
-  // ── Siliguri corridor (narrow chicken neck) ──
-  [314, 172], [334, 162], [348, 162],
-  // ── Northeast (Assam / Arunachal wide blob) ──
-  [368, 158], [422, 154], [424, 162],
-  [424, 200], [424, 232],
-  // ── NE south / Nagaland / Mizoram ──
-  [408, 248], [390, 258], [370, 260], [352, 255],
-  // ── WB / Bangladesh coast ──
-  [338, 260], [318, 265], [302, 268], [286, 276], [274, 284],
-  // ── East coast: Odisha → AP → TN ──
-  [262, 295], [252, 310], [242, 330],
-  [232, 358], [220, 390], [210, 420],
-  [200, 445], [192, 456], [188, 468], [184, 478],
-  // ── Southern tip ──
-  [170, 484], [158, 488], [144, 488],
-  [132, 486], [120, 480], [108, 468], [102, 455],
-  // ── West coast: Kerala → Karnataka → Goa → Maharashtra ──
-  [ 98, 438], [ 94, 418], [ 88, 395],
-  [ 82, 368], [ 78, 342], [ 76, 318],
-  [ 80, 298], [ 78, 282], [ 72, 272],
-  [ 64, 266], [ 54, 264], [ 44, 260],
-  [ 38, 258], [ 32, 250], [ 26, 244],
-  // ── Gujarat / Saurashtra / Kutch ──
-  [ 22, 234], [ 18, 225], [ 16, 215],
-  [ 20, 208], [ 28, 208], [ 36, 210],
-  [ 48, 214], [ 60, 214], [ 70, 212],
-  // ── Rajasthan back to start ──
-  [ 74, 196], [ 76, 178], [ 78, 162],
-  [ 82, 148], [ 86, 132], [ 90, 116], [ 93, 102],
+   MARKERS
+   ───────
+   MARKERS array — 7 intentionally placed pins, one per major region.
+   Each entry: { id, label, x, y } where x/y are viewBox coordinates.
+   ► To add a marker: append a new object to MARKERS.
+   ► To move a marker: change x / y (use the formula above).
+   ► To remove: delete its line.
+   Everything else (hover, tooltip) updates automatically.
+═══════════════════════════════════════════════════════════ */
+
+/* ──────────────────────────────────────────────────────────
+   INDIA BOUNDARY POLYGON
+   Clockwise from SW Pakistan border.
+   formula: x = (lon − 67) × 14,  y = (38.5 − lat) × 15.5
+────────────────────────────────────────────────────────── */
+const INDIA_PTS: [number, number][] = [
+  // Pakistan–Rajasthan western border (going north)
+  [17, 224], [20, 193], [68, 148], [90, 112], [88, 88],
+  // J&K LoC → LAC with China
+  [76, 60], [118, 46], [152, 46], [168, 60], [168, 100],
+  // Himachal Pradesh, Uttarakhand
+  [156, 116], [180, 130],
+  // Nepal border heading east
+  [182, 148], [210, 156], [252, 162], [292, 172], [300, 178],
+  // Siliguri corridor north into Northeast
+  [306, 178],
+  // Northeast clockwise: Bhutan border → Arunachal → Myanmar → Bangladesh
+  [322, 176], [350, 166], [390, 146], [426, 142],
+  [428, 168], [408, 192], [386, 214], [368, 236],
+  [356, 246], [346, 238], [340, 248],
+  [328, 240], [316, 216], [306, 210], [302, 194],
+  // WB / Bangladesh border → east coast going south
+  [300, 262], [284, 278],
+  [270, 290], [258, 308], [244, 324], [228, 336],
+  [210, 352], [194, 366], [184, 386], [182, 400],
+  [176, 416], [162, 440], [150, 460],
+  // Kanyakumari tip
+  [144, 478], [138, 474],
+  // West coast: Kerala → Goa → Maharashtra
+  [124, 455], [116, 434], [112, 412],
+  [106, 390], [100, 366], [94, 340],
+  [90, 316], [84, 292], [80, 268],
+  // Gujarat: Gulf of Khambhat → Kathiawar peninsula → Kutch
+  [76, 252], [80, 244],
+  [68, 258], [50, 268], [34, 258], [22, 248],
+  // Kutch / Rann → Pakistan border close
+  [20, 238], [24, 228], [17, 220],
 ];
 
-/* ───────────────────────────────────────────────────────────
-   2. POINT-IN-POLYGON  (ray-casting algorithm)
-─────────────────────────────────────────────────────────── */
-function insideIndia(px: number, py: number): boolean {
-  let inside = false;
-  const n = INDIA_POLYGON.length;
-  for (let i = 0, j = n - 1; i < n; j = i++) {
-    const [xi, yi] = INDIA_POLYGON[i];
-    const [xj, yj] = INDIA_POLYGON[j];
-    if ((yi > py) !== (yj > py) &&
-        px < ((xj - xi) * (py - yi)) / (yj - yi) + xi) {
-      inside = !inside;
-    }
-  }
-  return inside;
-}
+const INDIA_PATH = INDIA_PTS
+  .map(([x, y], i) => `${i === 0 ? "M" : "L"}${x},${y}`)
+  .join(" ") + "Z";
 
-/* ───────────────────────────────────────────────────────────
-   3. DOT GRID — pre-computed once at module load (never reruns)
-   Spacing: 10 px  |  Dot radius: 3 px
-─────────────────────────────────────────────────────────── */
-const DOT_SPACING = 10;
-const DOT_R       = 3;
+/* ──────────────────────────────────────────────────────────
+   PRESENCE MARKERS  (7 key regions — intentional, not exhaustive)
+   formula: x = (lon − 67) × 14,  y = (38.5 − lat) × 15.5
+────────────────────────────────────────────────────────── */
+interface Marker { id: string; label: string; x: number; y: number; }
 
-const DOTS: [number, number][] = (() => {
-  const pts: [number, number][] = [];
-  for (let y = 10; y <= 496; y += DOT_SPACING) {
-    for (let x = 14; x <= 430; x += DOT_SPACING) {
-      if (insideIndia(x, y)) pts.push([x, y]);
-    }
-  }
-  return pts;
-})();
-
-/* ───────────────────────────────────────────────────────────
-   4. PRESENCE LOCATIONS
-   ─────────────────────────────────────────────────────────
-   ► To ADD a state:    append a new object.
-   ► To REMOVE a state: delete its line.
-   ► To MOVE a marker:  change x / y using the formula above.
-   Everything else (tooltip, legend count, hover) updates
-   automatically.
-─────────────────────────────────────────────────────────── */
-interface Location { id: string; name: string; x: number; y: number; }
-
-const LOCATIONS: Location[] = [
-  { id: "jk", name: "Jammu & Kashmir",  x: 109, y:  70 },
-  { id: "hp", name: "Himachal Pradesh", x: 148, y: 112 },
-  { id: "pb", name: "Punjab",           x: 111, y: 107 },
-  { id: "ch", name: "Chandigarh",       x: 136, y: 120 },
-  { id: "hr", name: "Haryana",          x: 122, y: 146 },
-  { id: "dl", name: "New Delhi",        x: 143, y: 154 },
-  { id: "uk", name: "Uttarakhand",      x: 156, y: 127 },
-  { id: "up", name: "Uttar Pradesh",    x: 196, y: 179 },
-  { id: "rj", name: "Rajasthan",        x: 124, y: 175 },
-  { id: "gj", name: "Gujarat",          x:  82, y: 238 },
-  { id: "mp", name: "Madhya Pradesh",   x: 169, y: 235 },
-  { id: "br", name: "Bihar",            x: 254, y: 201 },
-  { id: "jh", name: "Jharkhand",        x: 258, y: 234 },
-  { id: "wb", name: "West Bengal",      x: 301, y: 248 },
-  { id: "or", name: "Odisha",           x: 263, y: 283 },
-  { id: "mh", name: "Maharashtra",      x: 156, y: 270 },
-  { id: "tg", name: "Telangana",        x: 162, y: 325 },
-  { id: "ap", name: "Andhra Pradesh",   x: 190, y: 342 },
-  { id: "ka", name: "Karnataka",        x: 148, y: 390 },
-  { id: "tn", name: "Tamil Nadu",       x: 185, y: 393 },
-  { id: "as", name: "Assam",            x: 364, y: 190 },
+const MARKERS: Marker[] = [
+  { id: "north",  label: "North India",    x: 136, y: 118 }, // Chandigarh/Punjab/HP
+  { id: "delhi",  label: "Delhi & UP",     x: 155, y: 157 }, // Delhi NCR
+  { id: "raj",    label: "Rajasthan",      x:  92, y: 194 }, // Jaipur area
+  { id: "guj",    label: "Gujarat",        x:  80, y: 240 }, // Ahmedabad
+  { id: "mh",     label: "Maharashtra",    x: 128, y: 298 }, // Pune/Mumbai
+  { id: "east",   label: "East India",     x: 258, y: 258 }, // Kolkata/WB/Bihar
+  { id: "south",  label: "South India",    x: 148, y: 388 }, // Bengaluru
 ];
 
-/* ───────────────────────────────────────────────────────────
-   Dot layer — memoised so it never re-renders on hover
-─────────────────────────────────────────────────────────── */
-const DotsLayer = memo(function DotsLayer() {
-  return (
-    <>
-      {DOTS.map(([x, y], i) => (
-        <circle key={i} cx={x} cy={y} r={DOT_R} fill="#B8C4D8" />
-      ))}
-    </>
-  );
-});
-
-/* ───────────────────────────────────────────────────────────
-   Main component
-─────────────────────────────────────────────────────────── */
+/* ──────────────────────────────────────────────────────────
+   Component
+────────────────────────────────────────────────────────── */
 export default function IndiaPresenceMap() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [active, setActive] = useState<Location | null>(null);
+  const [active, setActive] = useState<Marker | null>(null);
   const [cursor, setCursor] = useState({ x: 0, y: 0 });
 
   function onMouseMove(e: React.MouseEvent) {
@@ -170,66 +116,99 @@ export default function IndiaPresenceMap() {
     setCursor({ x: e.clientX - left, y: e.clientY - top });
   }
 
-  const containerW = containerRef.current?.offsetWidth ?? 400;
+  const containerW = containerRef.current?.offsetWidth ?? 420;
 
   return (
     <div className="w-full flex flex-col items-center gap-10">
 
-      {/* ── Map ── */}
+      {/* Map */}
       <div
         ref={containerRef}
-        className="relative w-full max-w-[400px] mx-auto select-none"
+        className="relative w-full max-w-[420px] mx-auto select-none"
         onMouseMove={onMouseMove}
         onMouseLeave={() => setActive(null)}
       >
         <svg
           viewBox="0 0 460 540"
           className="w-full h-auto"
-          aria-label="India dot map showing Tasmed presence locations"
+          aria-label="India dot map showing Tasmed presence"
         >
-          {/* Dot silhouette — never re-renders */}
-          <DotsLayer />
+          <defs>
+            {/* ── Hexagonal dot pattern ──────────────────────────────
+                Tile: 11 × 19.05 px  |  3 dots per tile  |  hex grid
+                Adjust width/height to change dot density.          */}
+            <pattern
+              id="hexdots"
+              x="0" y="0"
+              width="11" height="19.05"
+              patternUnits="userSpaceOnUse"
+            >
+              <circle cx="5.5"  cy="4.76"  r="1.5" fill="#BCC8D4" />
+              <circle cx="0"    cy="14.29" r="1.5" fill="#BCC8D4" />
+              <circle cx="11"   cy="14.29" r="1.5" fill="#BCC8D4" />
+            </pattern>
 
-          {/* Presence markers — re-render only on hover */}
-          {LOCATIONS.map((loc) => {
-            const hot = active?.id === loc.id;
+            {/* ── India silhouette clip path ─────────────────────── */}
+            <clipPath id="india-clip">
+              <path d={INDIA_PATH} />
+            </clipPath>
+          </defs>
+
+          {/* Dot field clipped to India shape */}
+          <rect
+            x="0" y="0" width="460" height="540"
+            fill="url(#hexdots)"
+            clipPath="url(#india-clip)"
+          />
+
+          {/* Silhouette outline — gives the edge a crisp definition */}
+          <path
+            d={INDIA_PATH}
+            fill="none"
+            stroke="#CDD5DE"
+            strokeWidth="0.6"
+            strokeLinejoin="round"
+          />
+
+          {/* ── Presence markers ─────────────────────────────────── */}
+          {MARKERS.map((m) => {
+            const hot = active?.id === m.id;
             return (
               <g
-                key={loc.id}
-                onMouseEnter={() => setActive(loc)}
+                key={m.id}
+                onMouseEnter={() => setActive(m)}
                 onMouseLeave={() => setActive(null)}
                 style={{ cursor: "default" }}
               >
-                {/* Expanding halo */}
+                {/* Expanding halo on hover */}
                 <circle
-                  cx={loc.x} cy={loc.y}
-                  r={hot ? 15 : 0}
+                  cx={m.x} cy={m.y}
+                  r={hot ? 16 : 0}
                   fill="#F26522"
-                  fillOpacity={0.14}
-                  style={{ transition: "r 0.22s ease" }}
+                  fillOpacity={0.1}
+                  style={{ transition: "r 0.24s ease" }}
                 />
-                {/* Outer ring */}
+                {/* Soft ring */}
                 <circle
-                  cx={loc.x} cy={loc.y}
-                  r={hot ? 9 : 7}
+                  cx={m.x} cy={m.y}
+                  r={hot ? 9 : 0}
                   fill="#F26522"
-                  fillOpacity={hot ? 0.22 : 0}
-                  style={{ transition: "r 0.18s ease, fill-opacity 0.18s ease" }}
+                  fillOpacity={0.18}
+                  style={{ transition: "r 0.2s ease" }}
                 />
-                {/* Main dot */}
+                {/* Main pin */}
                 <circle
-                  cx={loc.x} cy={loc.y}
-                  r={hot ? 6 : 4.5}
+                  cx={m.x} cy={m.y}
+                  r={hot ? 5.5 : 4}
                   fill="#F26522"
-                  fillOpacity={hot ? 1 : 0.9}
-                  style={{ transition: "r 0.15s ease" }}
+                  style={{ transition: "r 0.16s ease" }}
                 />
                 {/* White centre pip */}
                 <circle
-                  cx={loc.x} cy={loc.y}
-                  r={hot ? 2 : 1.5}
+                  cx={m.x} cy={m.y}
+                  r={hot ? 2.2 : 1.6}
                   fill="white"
-                  style={{ transition: "r 0.15s ease" }}
+                  style={{ transition: "r 0.16s ease" }}
                 />
               </g>
             );
@@ -244,13 +223,12 @@ export default function IndiaPresenceMap() {
                        font-inter text-[11px] font-semibold tracking-[0.05em]
                        px-3 py-[7px] rounded-lg shadow-lg whitespace-nowrap"
             style={{
-              left: Math.max(55, Math.min(cursor.x, containerW - 55)),
-              top:  cursor.y - 46,
+              left: Math.max(60, Math.min(cursor.x, containerW - 60)),
+              top:  cursor.y - 50,
               transform: "translateX(-50%)",
             }}
           >
-            {active.name}
-            {/* Caret */}
+            {active.label}
             <span
               className="absolute left-1/2 -translate-x-1/2 top-full
                          border-l-[5px] border-r-[5px] border-t-[5px]
@@ -260,7 +238,7 @@ export default function IndiaPresenceMap() {
         )}
       </div>
 
-      {/* ── Stats row ── */}
+      {/* Stats row */}
       <div className="flex flex-wrap items-center justify-center gap-x-7 gap-y-3">
         <div className="flex items-center gap-2">
           <span className="w-[9px] h-[9px] rounded-full bg-brand/80 flex-shrink-0" />
@@ -273,9 +251,9 @@ export default function IndiaPresenceMap() {
 
         <span className="font-inter text-[12px] text-navy/55 tracking-wide">
           <span className="font-barlow font-black text-navy text-[17px] leading-none mr-1">
-            {LOCATIONS.length}
+            20+
           </span>
-          Active Regions
+          States Covered
         </span>
 
         <span className="w-px h-4 bg-gray-200 hidden sm:block" />
