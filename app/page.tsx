@@ -149,7 +149,6 @@ function HeroV2() {
           <div className="flex items-stretch border-t border-gray-100 pt-8">
             {(
               [
-                { value: "30+",  label: "Years"     },
                 { value: "280+", label: "Products"  },
                 { value: "980+", label: "Stockists" },
               ] as const
@@ -252,17 +251,6 @@ function HeroV2() {
             <circle cx="28"  cy="598" r="3"   fill="white"   fillOpacity="0.18" />
           </svg>
 
-          {/* Floating card: 30+ Years — top-right */}
-          <div
-            className="absolute top-12 right-8
-                       bg-brand rounded-2xl px-5 py-4
-                       shadow-[0_12px_40px_rgba(242,101,34,0.40)]"
-          >
-            <p className="font-barlow font-black text-white text-[30px] leading-none">30+</p>
-            <p className="font-inter text-[10px] text-white/75 tracking-[0.08em] uppercase mt-0.5">
-              Years of Trust
-            </p>
-          </div>
 
           {/* Left-edge fade (desktop only — softens the hard seam) */}
           <div className="hidden md:block absolute inset-y-0 left-0 w-12
